@@ -1,0 +1,69 @@
+######################################################################################################################################
+# This file contains instructions & commands to sign and add some Oracle Virtualbox modules
+# into Linux kernel.
+# This script is related to Oracte Virtualbox issue #11577: https://www.virtualbox.org/ticket/11577
+#
+# Config:
+#	- Distro: Ubuntu 14.04 LTS (Trusty)
+#	- Linux kernel: 3.19
+#	- Oracle Virtualbox 5.1 (official Oracle repo: https://www.virtualbox.org/wiki/Linux_Downloads)
+#
+# DISCLAIMER: as the date of writing (July, 2016), this process is known to FAIL! 
+# 	A request has been posted on Ubuntu forum - I will keep updated
+#
+# Credits: many thanks to:
+#	- This "It's my life" blog post (Fedora): "VBox & VMware in SecureBoot Linux (2016 Update)"
+#		(http://gorka.eguileor.com/vbox-vmware-in-secureboot-linux-2016-update/)
+#	- Ubuntu forum, post "Could not load 'vboxdrv' after upgrade to Ubuntu 16.04 (and I want to keep secure boot)"
+#		(https://askubuntu.com/questions/760671/could-not-load-vboxdrv-after-upgrade-to-ubuntu-16-04-and-i-want-to-keep-secur)
+####################################################################################################################################### 
+
+
+# 1-Generate an RSA signing key and the correspondig CER certificate 
+# OpenSSL is a good candidate - remove '-nodes' to provide a passphrase
+openssl req -new -x509 -newkey rsa:4096 -keyout MOK-vbox.priv -outform DER -out MOK-vbox.der -nodes -days 36500 -subj "/CN=<local authority name>/"
+
+# 2-List all the modules which have to be signed
+ll $(dirname $(modinfo -n vboxdrv))
+
+# In my case: 
+#	- vboxdrv
+#	- vboxnetadp
+#	- vboxnetflt
+#	- vboxpci
+
+# 3-Sign kernel modules 
+sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 ./MOK-vbox.priv ./MOK-vbox.der $(modinfo -n vboxdrv)
+sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 ./MOK-vbox.priv ./MOK-vbox.der $(modinfo -n vboxnetadp)
+sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 ./MOK-vbox.priv ./MOK-vbox.der $(modinfo -n vboxnetflt)
+sudo /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha512 ./MOK-vbox.priv ./MOK-vbox.der $(modinfo -n vboxpci)
+
+# 4[Optional]-check that the signature is effective
+modinfo vboxdrv 
+
+# In my case: 
+#	signer:         <local authority name>
+#	sig_key:        <signature key hash>
+#	sig_hashalgo:   sha512
+
+# 5-Register the public key (=DER certificate) for the UEFI/Secure Boot:
+sudo mokutil --import MOK.der*
+
+#A passphrase will be asked; provide one, and remember it! 
+#BE CAREFUL: the registration will take effect after a reboot, during which the passphrase will be asked. 
+#However, generally keyboard will be set up in a QWERTY fashion during this step, so be sure to be able to "translate" 
+#your passphrase in QWERTY is this is not yous usual configuration
+
+
+# 6-The step above is just a registration demand. To perform it, you have to reboot and to follow the instructions 
+sudo reboot 
+
+# 7-After reboot, load all the previously signed modules 
+# DISCLAIMER: this actually fails :-(
+
+sudo modprobe vboxdrv
+sudo modprobe vboxnetadp
+sudo modprobe vboxnetflt
+sudo modprobe vboxpci
+
+
