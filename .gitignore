@@ -1,3 +1,7 @@
+# MacOS files
+**/.DS_Store
+
 # Genealogy project 
 ## No reral data, only samples
 genealogy/genealogy.csv
+genealogy/_tmp_/
