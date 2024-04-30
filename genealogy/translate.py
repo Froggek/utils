@@ -28,9 +28,9 @@ with open('./data/genealogy.csv') as translations:
             
             elif key == 'birthdate' and row[idx]:
                 # See strftime() patterns
-                # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes 
+                    # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes 
                 birth_date = date.fromisoformat(row[idx])
-                # If idxx contains 'birthdate', then (idx + 1) contains 'keybirthdate'
+                # If idx contains 'birthdate', then (idx + 1) contains 'keybirthdate'
                 birth_year = row[idx + 1]
 
                 # FamilyScript - b19900101
@@ -38,23 +38,23 @@ with open('./data/genealogy.csv') as translations:
                     f'b{birth_year}0101',
                     birth_date.strftime('b%Y%m%d') 
                 )
-                # GEDCOM
-                # By adding "-" ("#" on non-Unix systems), 
-                # this removed the leading 0's (left padding) 
-                # https://stackoverflow.com/questions/904928/python-strftime-date-without-leading-0 
+                # GEDCOM - DATE 1 JAN 1990
+                    # By adding "-" ("#" on non-Unix systems), 
+                    # this removed the leading 0's (left padding) 
+                    # https://stackoverflow.com/questions/904928/python-strftime-date-without-leading-0 
                 tree_raw = tree_raw.replace(
                     f'DATE 1 JAN {birth_year}', 
-                    birth_date.strftime('DATE %-d %b %Y').upper() # DATE 1 JAN 1990
+                    birth_date.strftime('DATE %-d %b %Y').upper()
                 )
-                # CSV
+                # CSV - 1990,1,1
                 tree_raw = tree_raw.replace(
                     f'{birth_year},1,1', 
-                    birth_date.strftime('%Y,%-m,%-d') # 1990,1,1
+                    birth_date.strftime('%Y,%-m,%-d') 
                 )
-                # Plain text
+                # Plain text - 1 Jan 1990
                 tree_raw = tree_raw.replace(
                     f'1 Jan {birth_year}', 
-                    birth_date.strftime('%-d %b %Y') # 1 Jan 1990
+                    birth_date.strftime('%-d %b %Y')
                 )
 
         
