@@ -3,6 +3,8 @@
 
 # Genealogy project 
 ## No reral data, only samples
-genealogy/genealogy.csv
 genealogy/_tmp_/
+genealogy/data/genealogy.csv
+genealogy/data/source.html
+genealogy/data/target.html
 
