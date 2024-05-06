@@ -4,7 +4,7 @@
 # Genealogy project 
 ## No reral data, only samples
 genealogy/_tmp_/
-genealogy/data/genealogy.csv
+genealogy/data/mapping.csv
 genealogy/data/source.html
 genealogy/data/target.html
 
