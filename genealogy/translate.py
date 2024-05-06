@@ -10,7 +10,7 @@ with open('./data/source.html', 'r') as tree_source_html:
 
 # print(tree_raw)
 
-with open('./data/genealogy.csv') as translations:
+with open('./data/mapping.csv') as translations:
     translations_csv_reader = csv.reader(translations, delimiter=',', quotechar='"')
 
     # headers_row = ['initials', 'name', 'nickname', 'surname', 'birthsurname', 'birthdate', 'keybirthdate']
